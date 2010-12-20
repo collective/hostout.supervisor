@@ -185,12 +185,12 @@ def supervisorboot():
 
 def predeploy():
     hostout = api.env.hostout
-    supervisorshutdown()
+    api.env.hostout.supervisorshutdown()
     if hostout.options.get('install-on-startup') is not None:
-        installonstartup()
+        api.env.hostout.installonstartup()
 
 def postdeploy():
-    supervisorstartup()
+    api.env.hostout.supervisorstartup()
         
 def supervisorstartup():
     """Start the supervisor daemon"""
@@ -199,20 +199,19 @@ def supervisorstartup():
     bin = "%(path)s/bin" % locals()
     supervisor = hostout.options['supervisor']
     try:
-        api.run("%(bin)s/%(s)sctl reread; %(bin)s/%(s)sctl start all" %dict(bin=bin,s=supervisor))
+        api.env.hostout.supervisorctl('reread')
+        api.env.hostout.supervisorctl('start all')
     except:
-        api.sudo("%(bin)s/%(supervisor)sd"% locals())
-    api.run("%(bin)s/%(supervisor)sctl status"% locals())
+        api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
+    api.env.hostout.supervisorctl('status')
 
-@buildoutuser
 def supervisorshutdown():
     """Shutdown the supervisor daemon"""
-    hostout = api.env.hostout
-    path = hostout.getRemoteBuildoutPath()
-    bin = "%(path)s/bin" % locals()
-    supervisor = hostout.options['supervisor']
-    api.run("%(bin)s/%(supervisor)sctl stop all || echo 'Failed to shutdown'"% locals() )
-
+    try:
+        api.env.hostout.supervisorctl('stop all')
+    except:
+        pass
+    
 @buildoutuser
 def supervisorctl(*args):
     """Runs remote supervisorlctl with given args"""
