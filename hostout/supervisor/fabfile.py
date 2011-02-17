@@ -188,10 +188,12 @@ def predeploy():
     api.env.hostout.supervisorshutdown()
     if hostout.options.get('install-on-startup') is not None:
         api.env.hostout.installonstartup()
+    api.env.superfun()
 
 def postdeploy():
+    api.env.superfun()
     api.env.hostout.supervisorstartup()
-        
+
 def supervisorstartup():
     """Start the supervisor daemon"""
     hostout = api.env.hostout
@@ -199,21 +201,17 @@ def supervisorstartup():
     bin = "%(path)s/bin" % locals()
     supervisor = hostout.options['supervisor']
     try:
-        api.env.hostout.supervisorctl('reread')
-        api.env.hostout.supervisorctl('start all')
+        api.sudo("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
     except:
         api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
     api.env.hostout.supervisorctl('status')
 
 def supervisorshutdown():
     """Shutdown the supervisor daemon"""
-    try:
-        api.env.hostout.supervisorctl('stop all')
-    except:
-        pass
+    api.env.hostout.supervisorctl('stop all',ignore_errors=True)
     
 @buildoutuser
-def supervisorctl(*args):
+def supervisorctl(*args, **vargs):
     """Runs remote supervisorlctl with given args"""
     hostout = api.env.hostout
     path = hostout.getRemoteBuildoutPath()
@@ -222,7 +220,14 @@ def supervisorctl(*args):
     if not args:
         args = ['status']
     args = ' '.join(args)
-    api.run("%(bin)s/%(supervisor)sctl %(args)s" % locals())
+    try:
+        api.run("%(bin)s/%(supervisor)sctl %(args)s" % locals())
+    except:
+        if vargs.get('ignore_errors'):
+            return False
+        else:
+            raise
+    return True
 
 
 @buildoutuser
