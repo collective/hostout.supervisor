@@ -192,20 +192,38 @@ def predeploy():
 
 def postdeploy():
     api.env.superfun()
-    api.env.hostout.supervisorstartup()
+    if api.env.get('sudosupervisor', False):
+        api.env.hostout.sudosupervisorstartup()
+    else:
+        api.env.hostout.supervisorstartup()
 
+@buildoutuser
 def supervisorstartup():
     """Start the supervisor daemon"""
     hostout = api.env.hostout
     path = hostout.getRemoteBuildoutPath()
     bin = "%(path)s/bin" % locals()
-    supervisor = hostout.options['supervisor']
+    supervisor = hostout.options.get('sudosupervisor') or hostout.options.get('supervisor')
     try:
-        api.sudo("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
+        api.run("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
     except:
-        api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
+        api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
     api.env.hostout.supervisorctl('status')
 
+def sudosupervisorstartup():
+    "Start supervisor as su"
+    hostout = api.env.hostout
+    path = hostout.getRemoteBuildoutPath()
+    bin = "%(path)s/bin" % locals()
+    supervisor = hostout.options['sudosupervisor']
+    #ensure we are really running in sudo mode
+    with api.settings(warn_only=True):
+        api.sudo("%(bin)s/%(supervisor)sctl shutdown"% dict(bin=bin, supervisor=supervisor))
+    api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
+    api.env.hostout.supervisorctl('status')
+
+
+@buildoutuser
 def supervisorshutdown():
     """Shutdown the supervisor daemon"""
     api.env.hostout.supervisorctl('stop all',ignore_errors=True)
@@ -216,7 +234,7 @@ def supervisorctl(*args, **vargs):
     hostout = api.env.hostout
     path = hostout.getRemoteBuildoutPath()
     bin = "%(path)s/bin" % locals()
-    supervisor = hostout.options['supervisor']
+    supervisor = hostout.options.get('sudosupervisor') or hostout.options.get('supervisor')
     if not args:
         args = ['status']
     args = ' '.join(args)

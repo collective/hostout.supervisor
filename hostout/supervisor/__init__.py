@@ -32,8 +32,11 @@ class Recipe:
 
     def __init__(self, buildout, name, options):
         self.name, self.options, self.buildout = name, options, buildout
-        supervisor = self.options.get('supervisor','supervisor')
-        self.options['supervisor'] = supervisor
+        supervisor = self.options.setdefault('sudosupervisor', '')
+        if supervisor:
+          self.options.setdefault('supervisor','')
+        else:
+          self.options.setdefault('supervisor','supervisor')
 
     def install(self):
         return []
