@@ -43,10 +43,10 @@ setup(
 #    data_files = [('.', ['*.txt'])],
 #    package_data = {'':('*.txt')},
     namespace_packages = ['hostout'],
-    install_requires = ['zc.buildout',
+    install_requires = [
                         'zc.recipe.egg',
                         'setuptools',
-                        'collective.hostout',
+                        'collective.hostout>=1.0a5',
                         ],
     entry_points = {'zc.buildout':['default = hostout.supervisor:Recipe'],
                     'fabric': ['fabfile = hostout.supervisor.fabfile']
