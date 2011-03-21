@@ -117,3 +117,4 @@ Dylan Jay ( software at pretaweb dot com )
 .. _collective.hostout: http://pypi.python.org/pypi/collective.hostout
 .. _hostout: http://pypi.python.org/pypi/collective.hostout
 .. _supervisor: http://pypi.python.org/pypi/collective.recipe.supervisor
+.. _supervisord: http://supervisord.org
