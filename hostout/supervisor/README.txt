@@ -68,6 +68,9 @@ option.
     Generated script '/sample-buildout/bin/hostout'.
     ...
 
+Hostout.supervisor commands
+***************************
+
 >>> print system('bin/hostout host')
     cmdline is: bin/hostout host1 [host2...] [all] cmd1 [cmd2...] [arg1 arg2...]
     Valid commands are:
@@ -88,22 +91,25 @@ init.d
   If set the supervisord script will be linked into init.d so any machine restart will also
   start supervisor
 
+Automatic startup and shutdown during deployment
+************************************************
+
 In addition supervisor plugin will shutdown supervisor during pre-deployment and startup
 supervisor during post-deployment.
 
 >>> print system('bin/hostout host1 deploy')
-    Hostout: Running command 'predeploy' from '/.../collective/hostout/supervisor/fabfile.py'
+    Hostout: Running command 'predeploy' from 'hostout.supervisor.fabfile'
     Logging into the following hosts as :
         127.0.0.1
     [127.0.0.1] sudo: /var/lib/plone/host1/bin/supervisorctl shutdown || echo 'Failed to shutdown'
     ...
-    Hostout: Running command 'postdeploy' from '/.../collective/hostout/supervisor/fabfile.py'
+    Hostout: Running command 'postdeploy' from 'hostout.supervisor.fabfile'
     ...
     [127.0.0.1] sudo: /var/lib/plone/host1/bin/supervisord
     ...
     [127.0.0.1] sudo: /var/lib/plone/host1/bin/supervisorctl status
     ...
-    Hostout: Running command 'postdeploy' from '.../collective.hostout/collective/hostout/fabfile.py'
+    Hostout: Running command 'postdeploy' from 'collective.hostout.fabfile'
     ...
 
 Credits
