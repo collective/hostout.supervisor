@@ -1,7 +1,7 @@
 import os
 import os.path  #import os.path.join, os.path.basename, os.path.dirname
 from fabric import api, contrib
-from collective.hostout.hostout import buildoutuser
+from collective.hostout.hostout import buildoutuser, asbuildoutuser
 
 
 initd = """
@@ -184,20 +184,16 @@ def supervisorboot():
 
 
 def predeploy():
+    api.env.superfun()
     hostout = api.env.hostout
     api.env.hostout.supervisorshutdown()
     if hostout.options.get('install-on-startup') is not None:
         api.env.hostout.installonstartup()
-    api.env.superfun()
 
 def postdeploy():
     api.env.superfun()
-    if api.env.get('sudosupervisor', False):
-        api.env.hostout.sudosupervisorstartup()
-    else:
-        api.env.hostout.supervisorstartup()
+    api.env.hostout.supervisorstartup()
 
-@buildoutuser
 def supervisorstartup():
     """Start the supervisor daemon"""
     hostout = api.env.hostout
@@ -205,21 +201,17 @@ def supervisorstartup():
     bin = "%(path)s/bin" % locals()
     supervisor = hostout.options.get('sudosupervisor') or hostout.options.get('supervisor')
     try:
-        api.run("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
+        with asbuildoutuser():
+            api.run("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
     except:
-        api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
-    api.env.hostout.supervisorctl('status')
+        if hostout.options.get('sudosupervisor',None):
+            with asbuildoutuser():
+                api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
+        else:
+            with api.settings(warn_only=True):
+                api.sudo("%(bin)s/%(supervisor)sctl shutdown"% dict(bin=bin, supervisor=supervisor))
+            api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
 
-def sudosupervisorstartup():
-    "Start supervisor as su"
-    hostout = api.env.hostout
-    path = hostout.getRemoteBuildoutPath()
-    bin = "%(path)s/bin" % locals()
-    supervisor = hostout.options['sudosupervisor']
-    #ensure we are really running in sudo mode
-    with api.settings(warn_only=True):
-        api.sudo("%(bin)s/%(supervisor)sctl shutdown"% dict(bin=bin, supervisor=supervisor))
-    api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
     api.env.hostout.supervisorctl('status')
 
 
