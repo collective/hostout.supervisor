@@ -21,7 +21,7 @@ def read(*rnames):
 name = "hostout.supervisor"
 setup(
     name = name,
-    version = "1.0a4",
+    version = "1.0a5",
     author = "Dylan Jay",
     author_email = "software@pretaweb.com",
     description = """Plugin for collective.hostout that starts and stops supervisor
