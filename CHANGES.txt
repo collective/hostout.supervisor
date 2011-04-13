@@ -1,6 +1,10 @@
 Release History
 ***************
 
+1.0a4 (2010-04-13)
+------------------
+- allows buildout user only deploy
+
 1.0a3 (2010-03-21)
 ------------------
 - new sudosupervisor for when you need to boot as root [Dylan Jay]
