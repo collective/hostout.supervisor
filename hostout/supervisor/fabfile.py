@@ -169,12 +169,15 @@ def supervisorboot():
     # based on
     # http://www.webmeisterei.com/friessnegger/2008/06/03/control-production-buildouts-with-supervisor/
     bin = "%s/bin" % hostout.getRemoteBuildoutPath()
-    supervisor = hostout.options['supervisor']
+    supervisor = hostout.options['supervisor'] or hostout.options['sudosupervisor']
     script = initd % locals()
     name = hostout.name
     path = '/etc/rc.d/init.d'
     api.sudo('test -f %(path)s/%(name)s-%(supervisor)s && rm %(path)s/%(name)s-%(supervisor)s || echo "pass"'%locals())
-    contrib.files.append(script, '%(path)s/%(name)s-%(supervisor)s'%locals(), use_sudo=True)
+    contrib.files.append(
+            text=script,
+            filename='%(path)s/%(name)s-%(supervisor)s'%locals(), 
+            use_sudo=True)
     api.sudo('chmod +x %(path)s/%(name)s-%(supervisor)s'%locals())
     api.sudo(('(which update-rc.d && update-rc.d %(name)s-%(supervisor)s defaults) || '
              '(test -f /sbin/chkconfig && /sbin/chkconfig --add %(name)s-%(supervisor)s)') % locals())
