@@ -33,12 +33,12 @@ def supervisorstartup():
             api.run("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
     except:
         if hostout.options.get('sudosupervisor',None):
-            with asbuildoutuser():
-                api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
-        else:
             with api.settings(warn_only=True):
                 api.sudo("%(bin)s/%(supervisor)sctl shutdown"% dict(bin=bin, supervisor=supervisor))
             api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
+        else:
+            with asbuildoutuser():
+                api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
 
     api.env.hostout.supervisorctl('status')
 
