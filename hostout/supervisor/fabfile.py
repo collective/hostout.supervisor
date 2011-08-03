@@ -6,9 +6,24 @@ from collective.hostout.hostout import buildoutuser, asbuildoutuser
 
 def supervisorboot():
     """Ensure that supervisor is started on boot"""
-    supervisor = hostout.name + "-" + hostout.options['supervisor'] or hostout.options['sudosupervisor']
-    name = supervisor
-    api.hostout.bootscript_install (supervisor + "d", supervisor + "ctl shutdown", name)     
+    hostout = api.env.hostout
+
+    sudosupervisor = hostout.options.get("sudosupervisor")
+    supervisor = sudosupervisor or hostout.options.get("supervisor")
+
+    if supervisor is None:
+        raise Exception ("No supervisor listed")
+
+    if sudosupervisor is not None:
+        effective_user = hostout.options.get("effective-user")
+        cmdbase = "sudo -u \"%s\" bin/" % effective_user
+    else:
+        cmdbase = "bin/"
+
+    cmdbase += supervisor
+    name = "%s-%s" % (hostout.name, supervisor)
+
+    hostout.install_bootscript (cmdbase + "d", cmdbase + "ctl shutdown", name)     
 
 
 def predeploy():
