@@ -2,6 +2,7 @@ import os
 import os.path  #import os.path.join, os.path.basename, os.path.dirname
 from fabric import api, contrib
 from collective.hostout.hostout import buildoutuser, asbuildoutuser
+import time
 
 
 def supervisorboot():
@@ -37,9 +38,17 @@ def supervisorstartup():
                 api.sudo("%(bin)s/%(supervisor)sctl shutdown"% dict(bin=bin, supervisor=supervisor))
             api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
         else:
-            with asbuildoutuser():
-                api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
 
+            buildout_user = hostout.options.get("buildout-user")
+            effective_user = hostout.options.get("effective-user")
+            if effective_user == buildout_user:
+                with asbuildoutuser():
+                    api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
+            else:
+                api.sudo ("%(bin)s/%(supervisor)sd" % dict(bin=bin, supervisor=supervisor), user=effective_user)
+
+    
+    time.sleep(2) # give it a little chance
     api.env.hostout.supervisorctl('status')
 
 
