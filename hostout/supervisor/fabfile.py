@@ -30,13 +30,21 @@ def supervisorboot():
 def predeploy():
     api.env.superfun()
     hostout = api.env.hostout
-    api.env.hostout.supervisorshutdown()
+    rollingrestart = hostout.options.get("rollingrestart", False)
+    if not rollingrestart:
+        api.env.hostout.supervisorshutdown()
     if hostout.options.get('install-on-startup') is not None:
         api.env.hostout.installonstartup()
 
 def postdeploy():
     api.env.superfun()
-    api.env.hostout.supervisorstartup()
+    hostout = api.env.hostout
+    rollingrestart = hostout.options.get("rollingrestart", False)
+    if rollingrestart:
+        api.env.hostout.supervisorshutdown()
+        api.env.hostout.supervisorstartup()
+    else:
+        api.env.hostout.supervisorstartup()
 
 def supervisorstartup():
     """Start the supervisor daemon"""
@@ -62,8 +70,8 @@ def supervisorstartup():
             else:
                 api.sudo ("%(bin)s/%(supervisor)sd" % dict(bin=bin, supervisor=supervisor), user=effective_user)
 
+        time.sleep(5) # give it a little chance
     
-    time.sleep(2) # give it a little chance
     api.env.hostout.supervisorctl('status')
 
 
