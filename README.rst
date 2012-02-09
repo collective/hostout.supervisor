@@ -32,10 +32,11 @@ Generated script '/sample-buildout/bin/helloworld'.
 >>> print system('bin/helloworld')
 all your hosts are belong to us
 
-Google buildout + your fav app framework to findout how to build it.
+Google "buildout" and your favourite app framework to find out how to build
+it.
 
-Next we add a hostout to our buildout and we extend hostout by adding the supervisor plugin using the "extends"
-option.
+Next we add ``hostout`` to our buildout, and extend hostout by adding the
+``hostout.supervisor`` plugin using the ``extends`` option.
 
 
 >>> write('buildout.cfg',
@@ -68,7 +69,7 @@ option.
     Generated script '/sample-buildout/bin/hostout'.
     ...
 
-Hostout.supervisor commands
+hostout.supervisor commands
 ***************************
 
 >>> print system('bin/hostout host')
@@ -82,20 +83,20 @@ Hostout.supervisor commands
        supervisorstartup  : Start the supervisor daemon
     ...
  
-The following options maybe used
+The following options may be used:
 
-supervisor
+``supervisor``
   The name of the supervisor part to stop and restart
   
-init.d
-  If set the supervisord script will be linked into init.d so any machine restart will also
-  start supervisor
+``init.d``
+  If set, the ``supervisord`` script will be linked into ``init.d`` so any
+  machine restart will also start supervisor.
 
 Automatic startup and shutdown during deployment
 ************************************************
 
-In addition supervisor plugin will shutdown supervisor during pre-deployment and startup
-supervisor during post-deployment.
+In addition, the supervisor plugin will shutdown supervisor during
+pre-deployment and start up supervisor during post-deployment.
 
 >>> print system('bin/hostout host1 deploy')
     Hostout: Running command 'predeploy' from 'hostout.supervisor.fabfile'
