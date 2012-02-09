@@ -32,8 +32,6 @@ setup(
     long_description=(
         read('README.rst')
         + '\n' +
-        read('hostout', 'supervisor', 'README.rst')
-        + '\n' +
         read('CHANGES.txt')
         + '\n' 
         ),
