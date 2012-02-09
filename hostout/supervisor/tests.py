@@ -84,7 +84,7 @@ def test_suite():
     return unittest.TestSuite((
         #doctest.DocTestSuite(),
         doctest.DocFileSuite(
-            'README.txt',
+            'README.rst',
              package='hostout.supervisor',
             setUp=setUp, tearDown=tearDown,
             optionflags = flags,

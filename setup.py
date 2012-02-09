@@ -30,9 +30,9 @@ setup(
     keywords = "buildout, fabric, deploy, deployment, server, plone, django, host, hosting",
     url='https://svn.plone.org/svn/collective/'+name,
     long_description=(
-        read('README.txt')
+        read('README.rst')
         + '\n' +
-        read('hostout', 'supervisor', 'README.txt')
+        read('hostout', 'supervisor', 'README.rst')
         + '\n' +
         read('CHANGES.txt')
         + '\n' 
