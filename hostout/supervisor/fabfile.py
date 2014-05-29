@@ -10,13 +10,13 @@ def supervisorboot():
     """Ensure that supervisor is started on boot"""
     hostout = api.env.hostout
 
-    sudosupervisor = hostout.options.get("sudosupervisor")
+    sudosupervisor = hostout.options.get("sudosupervisor", '')
     supervisor = sudosupervisor or hostout.options.get("supervisor")
 
     if supervisor is None:
         raise Exception ("No supervisor listed")
 
-    if sudosupervisor is not None:
+    if sudosupervisor == '':  
         effective_user = hostout.options.get("effective-user")
         cmdbase = "sudo -u \"%s\" bin/" % effective_user
     else:
