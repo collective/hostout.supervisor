@@ -1,6 +1,11 @@
 Release History
 ***************
 
+1.05 (2012-05-29)
+-----------------
+- tidy up readme [Jean Jordaan]
+- fixed bootstrip install/uninstall [Adam Terrey]
+
 1.0a4 (2010-04-13)
 ------------------
 - allows buildout user only deploy

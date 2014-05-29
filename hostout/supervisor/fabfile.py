@@ -2,6 +2,7 @@ import os
 import os.path  #import os.path.join, os.path.basename, os.path.dirname
 from fabric import api, contrib
 from collective.hostout.hostout import buildoutuser, asbuildoutuser
+#from collective.hostout.hostout import  assudouser
 import time
 
 
@@ -56,7 +57,7 @@ def supervisorstartup():
         with asbuildoutuser():
             api.run("%(bin)s/%(supervisor)sctl reload"% dict(bin=bin, supervisor=supervisor))
     except:
-        if hostout.options.get('sudosupervisor',None):
+        if hostout.options.get('sudosupervisor','').strip():
             with api.settings(warn_only=True):
                 api.sudo("%(bin)s/%(supervisor)sctl shutdown"% dict(bin=bin, supervisor=supervisor))
             api.sudo("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
@@ -68,7 +69,8 @@ def supervisorstartup():
                 with asbuildoutuser():
                     api.run("%(bin)s/%(supervisor)sd"% dict(bin=bin, supervisor=supervisor))
             else:
-                api.sudo ("%(bin)s/%(supervisor)sd" % dict(bin=bin, supervisor=supervisor), user=effective_user)
+#                with assudouser():
+                    api.sudo ("%(bin)s/%(supervisor)sd" % dict(bin=bin, supervisor=supervisor), user=effective_user)
 
         time.sleep(5) # give it a little chance
     
